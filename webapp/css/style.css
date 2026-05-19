@@ -1,0 +1,155 @@
+ .columnRow .moveButtons {
+    opacity: 0;
+    pointer-events: none;
+}  
+
+/*  .columnRow:hover .moveButtons {
+    opacity: 1;
+    pointer-events: auto;
+}  */
+.moveButtons .sapMBtn {
+    margin-left: 4px;
+}
+
+/* hide by default */
+/*  .columnRow .moveButtons {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}  */
+
+/* show ONLY when selected */
+.columnRow.sapMLIBSelected .moveButtons {
+    opacity: 1;
+    pointer-events: auto;
+     transition: transform 0.2s ease;
+}
+
+/* .columnRow {
+    transition: transform 0.2s ease;
+} */
+
+.sapUiDnDDragging {
+    opacity: 0.5;
+}
+
+.sapUiDnDDragGhost {
+    background: #fff;
+    border: 1px dashed #ccc;
+    padding: 8px;
+}
+
+.sapUiDnDDropIndicator {
+    height: 2px;
+    background-color: #0a6ed1; /* SAP blue */
+}
+
+.cusGrpTableRowInfo  {
+    background-color: #e8f1fb !important;
+}
+.cusGrpSubtotalTableRowWarning {
+    background-color: #fff7d6 !important;
+    font-weight: bold !important;
+}
+
+.cusGrpGrandTotalTableRowSuccess {
+    background-color: #e7f7ed !important;
+    font-weight: bold !important;
+}
+/* Ensure sort icon remains visible in custom highlighted rows */
+.cusGrpSubtotalTableRowWarning .sapUiTableColResizer,
+.cusGrpSubtotalTableRowSuccess .sapUiTableColResizer {
+    z-index: 1;
+}
+/* ==========================================================
+   ALV FULL-COLUMN SELECTION HIGHLIGHT (UNCOMMENTED)
+   ========================================================== */
+
+/* 1. Highlight the header cell block */
+.sapUiTableCol.alvHighlightHeader,
+th.sapUiTableCol.alvHighlightHeader {
+    background-color: #d1e4fc !important;
+    border-bottom: 3.5px solid #0a6ed1 !important;
+}
+
+/* 2. Paint the vertical data cells body */
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol,
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol .sapUiTableCell,
+.alvSelectedColumn .sapUiTableCtrlTr.sapUiTableTrAlt > td.alvHighlightCol {
+    background-color: rgba(180, 215, 255, 0.35) !important;
+}
+
+/* 3. Add sharp borders to emphasize a vertical column block selection */
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol {
+    border-left: 1.5px solid #0a6ed1 !important;
+    border-right: 1.5px solid #0a6ed1 !important;
+}
+
+/* 4. Ensure highlight remains dominant even when hovering over rows */
+.alvSelectedColumn .sapUiTableCtrlTr:hover > td.alvHighlightCol,
+.alvSelectedColumn .sapUiTableCtrlTr:hover > td.alvHighlightCol .sapUiTableCell {
+    background-color: rgba(150, 195, 255, 0.45) !important;
+}
+/* ==========================================================
+   ALV FULL-COLUMN SELECTION HIGHLIGHT (HIGHER SPECIFICITY)
+   ========================================================== */
+
+/* 1. Force the background tint on all normal, alternate, and fixed data cells */
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol,
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol .sapUiTableCell,
+.alvSelectedColumn .sapUiTableCtrlTr.sapUiTableTrAlt > td.alvHighlightCol,
+.alvSelectedColumn .sapUiTableCtrlTr.sapUiTableTrAlt > td.alvHighlightCol .sapUiTableCell {
+    background-color: rgba(180, 215, 255, 0.35) !important;
+}
+
+/* 2. Add the sharp left and right borders to make it look exactly like a unified column selection */
+.alvSelectedColumn .sapUiTableCtrlTr > td.alvHighlightCol {
+    border-left: 1.5px solid #0a6ed1 !important;
+    border-right: 1.5px solid #0a6ed1 !important;
+}
+
+/* 3. Ensure the highlight remains dominant even when the user hovers over the row */
+.alvSelectedColumn .sapUiTableCtrlTr:hover > td.alvHighlightCol,
+.alvSelectedColumn .sapUiTableCtrlTr:hover > td.alvHighlightCol .sapUiTableCell {
+    background-color: rgba(150, 195, 255, 0.45) !important;
+}
+
+/* 4. Paint the matching Column Header container block */
+th.sapUiTableCol.alvHighlightHeader,
+.sapUiTableCol.alvHighlightHeader {
+    background-color: #d1e4fc !important;
+    border-bottom: 3.5px solid #0a6ed1 !important;
+}
+
+/* Keep text and icon side by side inside the table header box bounds */
+.sapUiTableColInner .sapMHBox {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Ensure header text scales elegantly and handles sizing boundaries */
+.alvHeaderLabelText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Give the active filter icon a pulse or simple color dominance over native text */
+.alvHeaderFilterIcon {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+.alvHeaderFilterIcon:hover {
+    color: #0854a1 !important; /* Slightly darker shade on cursor focus */
+}
+/* Styling to visually emphasize analytical group columns and subtotal values */
+.alvGroupedColumnHeader {
+    background-color: #f4f6f7 !important;
+    border-bottom: 2px solid #0a6ed1 !important;
+}
+
+/* Bold row content text if it is adjacent to an expansion icon (indicates a subtotal summary node) */
+.sapUiTableTreeIcon + .sapMText {
+    font-weight: bold !important;
+    color: #1d2d3d !important;
+}

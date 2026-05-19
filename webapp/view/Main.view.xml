@@ -1,0 +1,16 @@
+<mvc:View 
+    controllerName="com.grid.alvdemo.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m"
+    xmlns:custom="com.grid.alvdemo.control">
+    
+    <Page id="_IDGenPage" title="ALV Tree Grid Demo View">
+        <content>
+            <custom:Table 
+                id="alvTable"
+                title="Hierarchical Field Overview"
+                hierarchyPath="/catalog"
+                childArrayName="categories" />
+        </content>
+    </Page>
+</mvc:View>
