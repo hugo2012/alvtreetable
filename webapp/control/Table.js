@@ -115,7 +115,7 @@ sap.ui.define([
         },
 
         _initTable: function () {
-            const oModel = this.getModel();
+           /*  const oModel = this.getModel();
             if (!oModel) return;
 
             const sHierarchyPath = this.getHierarchyPath();
@@ -137,6 +137,26 @@ sap.ui.define([
                 });
 
                 this._applyState();
+            } */
+
+                const oModel = this.getModel();
+            if (!oModel) return;
+
+            const sHierarchyPath = this.getHierarchyPath();
+            const sChildArray = this.getChildArrayName();
+            const data = oModel.getProperty(sHierarchyPath);
+
+            if (data && data.length > 0) {
+                if (Object.keys(this._meta).length === 0) {
+                    this._extractMetadata(data[0]);
+                    this._initDefaultState();
+                }
+
+                // ✅ Clear old backups to ensure refreshing structural state remains clean
+                this._oOriginalDataBackup = null;
+
+                // Run state compiler engine directly 
+                this._applyState();
             }
         },
 
@@ -152,6 +172,10 @@ sap.ui.define([
 
         // =========================================================================
         // CORE ENGINE: APPLY SORT, FILTER, AND VISIBILITY STATES DYNAMICALLY
+        //By bypassing oBinding.filter(), we avoid the standard UI5 framework bug
+        // that hides tree child nodes. The logic explicitly checks: 
+        // "If a parent node passes the filter criteria, keep all of its children visible" 
+        //and "If a child node passes the filter criteria, preserve its parent structure".
         // =========================================================================
         _applyState: function () {
             const table = this._table;
@@ -205,37 +229,125 @@ sap.ui.define([
                     }
                 });
 
-            // 2. Execute Hierarchical Processing directly against Tree Binding Tree Elements
-            const oBinding = table.getBinding("rows");
-            if (oBinding) {
-                // Apply Sorting
-                if (aSorts.length > 0) {
-                    const aUi5Sorters = aSorts.map(s => new Sorter(s.key, s.descending));
-                    oBinding.sort(aUi5Sorters);
-                } else {
-                    oBinding.sort([]);
-                }
+            // 2. Execute Hierarchical Processing via Dataset Interception
+            const sHierarchyPath = this.getHierarchyPath();
+            const sChildArray = this.getChildArrayName();
+            const oModel = this.getModel();
+            if (!oModel) return;
 
-                // Apply Filtering (Transforms standard tokens configuration into UI5 core criteria)
-                if (aFilters.length > 0) {
-                    const aUi5Filters = [];
-                    aFilters.forEach(f => {
-                        if (f.value1) {
-                            aUi5Filters.push(new Filter(f.key, f.operator || FilterOperator.Contains, f.value1));
+            // Save original backup once to prevent permanently deleting rows from memory
+            if (!this._oOriginalDataBackup) {
+                this._oOriginalDataBackup = JSON.parse(JSON.stringify(oModel.getProperty(sHierarchyPath) || []));
+            }
+
+            // Always start filtering/sorting from a fresh copy of the master backup data
+            let aWorkingData = JSON.parse(JSON.stringify(this._oOriginalDataBackup));
+
+            // A. Apply Tree-Aware Filtering Rules Engine
+            if (aFilters.length > 0) {
+                
+                // Helper to validate if a single node satisfies all active filter configurations
+                const nodeMatchesFilters = (oNode) => {
+                    return aFilters.every(f => {
+                        const vVal = oNode[f.key];
+                        if (vVal === undefined || vVal === null) return false;
+                        const sNodeVal = vVal.toString().toLowerCase();
+
+                        if (f.operator === "Contains" && f.value1) {
+                            return sNodeVal.includes(f.value1.toLowerCase());
                         }
-                        if (f.values && f.values.length > 0) {
-                            f.values.forEach(tokenVal => {
-                                aUi5Filters.push(new Filter(f.key, FilterOperator.EQ, tokenVal));
-                            });
+                        if (f.operator === "EQ" && f.values && f.values.length > 0) {
+                            return f.values.some(tokenVal => tokenVal.toString().toLowerCase() === sNodeVal);
+                        }
+                        return true;
+                    });
+                };
+
+                // Recursive function to filter nodes while retaining parent-child hierarchies
+                const filterTreeNodes = (aNodes) => {
+                    if (!aNodes || !Array.isArray(aNodes)) return [];
+
+                    return aNodes.filter(oNode => {
+                        const bSelfMatches = nodeMatchesFilters(oNode);
+                        
+                        // Recursively process children if they exist
+                        if (oNode[sChildArray] && Array.isArray(oNode[sChildArray])) {
+                            const aFilteredChildren = filterTreeNodes(oNode[sChildArray]);
+                            
+                            if (bSelfMatches) {
+                                // Scenario 1: Parent matches -> Keep the parent AND all its original children intact
+                                return true; 
+                            } else if (aFilteredChildren.length > 0) {
+                                // Scenario 2: Parent fails, but children match -> Keep parent, show matching children
+                                oNode[sChildArray] = aFilteredChildren;
+                                return true;
+                            }
+                            return false;
+                        }
+                        
+                        // Scenario 3: Leaf node with no children -> Depend solely on self matching criteria
+                        return bSelfMatches;
+                    });
+                };
+
+                aWorkingData = filterTreeNodes(aWorkingData);
+            }
+
+            // B. Apply Sorter Layer Arrays directly to the data arrays
+            if (aSorts.length > 0) {
+                const sortTreeNodes = (aNodes) => {
+                    if (!aNodes || !Array.isArray(aNodes)) return;
+                    
+                    aNodes.sort((a, b) => {
+                        for (let i = 0; i < aSorts.length; i++) {
+                            const sortConf = aSorts[i];
+                            const valA = a[sortConf.key];
+                            const valB = b[sortConf.key];
+                            
+                            if (valA === valB) continue;
+                            
+                            const bDesc = sortConf.descending;
+                            if (typeof valA === "number" && typeof valB === "number") {
+                                return bDesc ? valB - valA : valA - valB;
+                            }
+                            const strA = (valA || "").toString();
+                            const strB = (valB || "").toString();
+                            return bDesc ? strB.localeCompare(strA) : strA.localeCompare(strB);
+                        }
+                        return 0;
+                    });
+
+                    // Sort children recursively
+                    aNodes.forEach(oNode => {
+                        if (oNode[sChildArray] && Array.isArray(oNode[sChildArray])) {
+                            sortTreeNodes(oNode[sChildArray]);
                         }
                     });
-                    oBinding.filter(aUi5Filters.length > 0 ? new Filter({ filters: aUi5Filters, and: true }) : []);
-                } else {
-                    oBinding.filter([]);
+                };
+
+                sortTreeNodes(aWorkingData);
+            }
+
+            // C. Push Modified Array State back to UI5 Runtime Core
+            // We use a separate sub-property '/_filteredCatalog' to keep UI5 runtime responsive
+            oModel.setProperty(sHierarchyPath + "_filtered", aWorkingData);
+
+            // Rebind rows to point dynamically to our filtered path destination
+            table.bindRows({
+                path: sHierarchyPath + "_filtered",
+                parameters: {
+                    arrayNames: [sChildArray]
                 }
+            });
+            // ✅ ADDED: Auto-expand all filtered nodes after binding completes
+            if (aFilters.length > 0) {
+                // Large arbitrary level number ensures all deeply nested children expand completely
+                table.expandToLevel(10); 
+            } else {
+                // Optional: If filters are cleared, collapse back to root level or a clean default baseline
+                table.collapseAll();
             }
         },
-
         _createALVHeaderLabel: function (sLabelText, sColumnKey) {
             const oText = new Text({ text: sLabelText, wrapping: false }).addStyleClass("alvHeaderLabelText");
             const oFilterIcon = new sap.ui.core.Icon({
