@@ -153,3 +153,26 @@ th.sapUiTableCol.alvHighlightHeader,
     font-weight: bold !important;
     color: #1d2d3d !important;
 }
+/* 1. Hide the action control buttons by default */
+.alvColumnsDisplayList .alvActionButtonsGroup {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.15s linear;
+}
+
+/* 2. Unhide buttons when mouse hovers over a custom list item row */
+.alvColumnsDisplayList .sapMLIB:hover .alvActionButtonsGroup {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 3. Keep buttons visible when a row is selected/active */
+.alvColumnsDisplayList .sapMLIBSelected .alvActionButtonsGroup {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Optional styling cleanup to make the actions look compact inside the dialog */
+.alvColumnsDisplayList .alvActionButtonsGroup .sapMBtn {
+    padding: 0 2px;
+}
