@@ -2,15 +2,75 @@
     controllerName="com.grid.alvdemo.controller.Main"
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m"
-    xmlns:custom="com.grid.alvdemo.control">
+    xmlns:f="sap.ui.layout.form"
+    xmlns:ut="sap.ui.table">
     
     <Page id="_IDGenPage" title="ALV Tree Grid Demo View">
         <content>
-            <custom:Table 
-                id="alvTable"
-                title="Hierarchical Field Overview"
-                hierarchyPath="/catalog"
-                childArrayName="categories" />
+            <VBox id="_IDGenVBox" class="sapUiTinyMargin originalForecastContainer" width="450px">
+                        
+                        <Title id="_IDGenTitle" text="Original Forecast Delivery Schedule" class="sapUiSmallMarginBottom forecastHeader" />
+                        
+                        <VBox id="_IDGenVBox1" class="forecastFormWrapper">
+                            <f:SimpleForm id="_IDGenSimpleForm"
+                                editable="true"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="4"
+                                labelSpanL="4"
+                                labelSpanM="4"
+                                labelSpanS="4"
+                                adjustLabelSpan="false"
+                                emptySpanXL="0"
+                                emptySpanL="0"
+                                emptySpanM="0"
+                                emptySpanS="0"
+                                columnsXL="1"
+                                columnsL="1"
+                                columnsM="1"
+                                singleContainerFullSize="false">
+                                <f:content>
+                                    
+                                    <Label id="_IDGenLabel1" text="Dlv.schedule" />
+                                    <Input id="_IDGenInput" value="DELINS001200" class="sapUiSizeCompact highlightField" />
+                                    
+                                    <Label id="_IDGenLabel2" text="Dlv.sched.date" />
+                                    <Input id="_IDGenInput1" value="06.06.2026" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel3" text="Valid from" />
+                                    <Input id="_IDGenInput2" value="" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel4" text="Valid to" />
+                                    <Input id="_IDGenInput3" value="" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel5" text="Date/last del." />
+                                    <Input id="_IDGenInput4" value="" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel6" text="Qty of LastDel." />
+                                    <Input id="_IDGenInput5" value="0" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel7" text="Last delivery" />
+                                    <Input id="_IDGenInput6" value="" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel8" text="Cml. iss. qty." />
+                                    <Input id="_IDGenInput7" value="360,000" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel9" text="Cml.dlv.qty" />
+                                    <Input id="_IDGenInput8" value="360,000" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel10" text="CmlQtyReceived" />
+                                    <Input id="_IDGenInput9" value="0,000" class="sapUiSizeCompact" />
+                                    
+                                    <Label id="_IDGenLabel11" text="CmlQtyInTransit" />
+                                    <Input id="_IDGenInput10" value="360,000" class="sapUiSizeCompact" />
+                                    
+                                </f:content>
+                            </f:SimpleForm>
+                        </VBox>
+                        
+                    </VBox>
+            <ut:TreeTable 
+                id="alvTable">
+            </ut:TreeTable>
         </content>
     </Page>
 </mvc:View>
